@@ -1,0 +1,40 @@
+<div class="basic-container">
+	<mat-accordion>
+		<mat-card>
+			<form [formGroup]='incomeData'>
+				<mat-form-field>
+			      <input matInput formControlName='dateOfIncome' [matDatepicker]="picker" placeholder="Date of Income">
+				  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+				  <mat-datepicker #picker></mat-datepicker>
+			    </mat-form-field>
+			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<mat-form-field class='singleBlock'>
+			      <mat-select formControlName='incomeFor' placeholder="Name">
+				    <mat-option *ngFor="let incomesor of incomesors" [value]="incomesor.id">
+				      {{incomesor.Name}}
+				    </mat-option>
+				  </mat-select>	
+			    </mat-form-field>
+			    		    
+			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			    <mat-form-field  class='matForField'>
+			      <mat-select formControlName='incomeCategory' placeholder="Income Category">
+				    <mat-option *ngFor="let category of categories" [value]="category.category">
+				      {{category.category}}
+				    </mat-option>
+				  </mat-select>			      
+			    </mat-form-field>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			    <mat-form-field class='singleBlock'>
+			      <input matInput formControlName='amount' placeholder="Amount">
+			    </mat-form-field>
+			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			    <mat-form-field class='singleBlock'>
+			      <input matInput formControlName='description' placeholder="Description">
+			    </mat-form-field>			    
+		    </form>
+		   </mat-card>		
+		<br>
+		<button mat-raised-button color="accent" [disabled]="!incomeData.valid" (click)="onFormSubmit()">Submit</button>
+	</mat-accordion>
+</div>

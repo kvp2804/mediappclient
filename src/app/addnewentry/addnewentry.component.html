@@ -1,0 +1,69 @@
+<div class="basic-container">
+	<mat-accordion>
+		<mat-expansion-panel>
+			<mat-expansion-panel-header>
+				<mat-panel-title>
+					Enter personal details:
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+
+			<form [formGroup]='patientInformation'>
+				<mat-form-field class='singleBlock'>
+			      <input matInput formControlName='addmissionNo' placeholder="Admission Number">
+			    </mat-form-field>
+			    <br>
+
+			    <mat-form-field class='singleBlock'>
+			      <input matInput formControlName='patientFirstName' placeholder="First Name">
+			    </mat-form-field>
+
+			    <mat-form-field class='singleBlock'>
+			      <input matInput formControlName='patientMiddleName' placeholder="Middle Name">
+			    </mat-form-field>
+
+			    <mat-form-field class='singleBlock'>
+			      <input matInput formControlName='patientLastName' placeholder="Last Name">
+			    </mat-form-field>
+			    <br>
+			    <mat-form-field  class='matForField'>
+			      <textarea  matInput formControlName='address' placeholder="Address"></textarea>
+			    </mat-form-field>
+			    <br>
+			    <mat-form-field>
+			      <input matInput formControlName='dateOfBirth' [matDatepicker]="picker" placeholder="Date of birth">
+				  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+				  <mat-datepicker #picker></mat-datepicker>
+			    </mat-form-field>
+			    <br>
+			    <mat-form-field class='singleBlock'>
+			      <input matInput formControlName='contactPerson' placeholder="Contact Person Details">
+			    </mat-form-field>
+			    
+			    <mat-form-field class='singleBlock'>
+			      <input matInput formControlName='contactPersonNumber' placeholder="Contact Person Phone">
+			    </mat-form-field>
+
+			    <br>
+
+			    <mat-form-field  class='singleBlock'>
+			      <mat-select formControlName='status' placeholder="Admission Status">
+				    <mat-option *ngFor="let statusCategory of statusCategories" [value]="statusCategory.category">
+				      {{statusCategory.category}}
+				    </mat-option>
+				  </mat-select>			      
+			    </mat-form-field>	
+
+				<mat-form-field>
+			      <input matInput formControlName='dateOfStatusChange' [matDatepicker]="picker1" placeholder="Date of Status Change">
+				  <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+				  <mat-datepicker #picker1></mat-datepicker>
+			    </mat-form-field>
+
+		    </form>
+		</mat-expansion-panel>	
+
+		<br>
+
+		<button mat-raised-button color="accent" [disabled]="!patientInformation.valid" (click)="onFormSubmit()">Submit</button>
+	</mat-accordion>
+</div>

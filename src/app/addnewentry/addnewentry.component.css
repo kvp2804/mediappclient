@@ -1,0 +1,14 @@
+.basic-container {
+  padding: 30px;
+}
+
+.matForField {
+  display: inline-flex;
+  flex-direction: column;
+  width: 90%;
+}
+
+.singleBlock {
+  display: inline-flex;  
+  width: 33%;
+}

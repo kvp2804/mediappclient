@@ -1,0 +1,89 @@
+<div>
+    <form class="form-inline-searchExpense" [formGroup]="expenseSearchForm" (ngSubmit)="onExpenseSearch()">
+
+      <mat-form-field class='searchExpensesFormBlock'>
+          <mat-select formControlName='searchPatientId' placeholder="Patient Name">
+              <mat-option *ngFor="let expensor of expensors" [value]="expensor.value">
+                {{expensor.displayValue}}
+              </mat-option>
+            </mat-select>
+        </mat-form-field>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <mat-form-field class='searchExpensesFormBlock'>
+            <input matInput formControlName="searchStartDate" [matDatepicker]="startDatePicker" placeholder="Start Date">
+            <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #startDatePicker></mat-datepicker>
+        </mat-form-field>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <mat-form-field class='searchExpensesFormBlock'>
+            <input matInput formControlName="searchEndDate" [matDatepicker]="endDataPicker" placeholder="End Date">
+            <mat-datepicker-toggle matSuffix [for]="endDataPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endDataPicker></mat-datepicker>
+        </mat-form-field>
+        <br>
+        <button type="submit" mat-raised-button color="accent" >Search</button>
+    </form>
+
+    <br>
+    <br>
+
+	<table mat-table [dataSource]='dataSource' class='mat-elevation-z8' id='expenseTable'>
+		<ng-container matColumnDef="expenseDate">
+		    <th mat-header-cell *matHeaderCellDef> Expense Date </th>
+		    <td mat-cell *matCellDef="let element"> {{element.expenseDate}} </td>
+		</ng-container>
+
+		<ng-container matColumnDef="expenseFor">
+		    <th mat-header-cell *matHeaderCellDef> Patient Name </th>
+		    <td mat-cell *matCellDef="let element"> {{element.expenseFor.patientFirstName }} {{element.expenseFor.patientLastName}} </td>
+		</ng-container>
+
+		<ng-container matColumnDef="expenseCategory">
+		    <th mat-header-cell *matHeaderCellDef> Expense Category </th>
+		    <td mat-cell *matCellDef="let element"> 
+		    	<mat-select [(value)]="element.expenseCategory">
+					<mat-option *ngFor="let category of categories" [value]="category.category">
+				      {{category.category}}
+				    </mat-option>
+				</mat-select>
+		    </td>
+
+		</ng-container>
+
+		<ng-container matColumnDef="amount">
+		    <th mat-header-cell *matHeaderCellDef> Expense Amount </th>
+		    <td mat-cell *matCellDef="let element"> 
+		    	<input matInput [value]="element.amount" [(ngModel)]="element.amount">
+		    </td>
+		</ng-container>
+
+		<ng-container matColumnDef="description">
+		    <th mat-header-cell *matHeaderCellDef> Description </th>
+		    <td mat-cell *matCellDef="let element">
+		    	<input matInput [value]="element.description" [(ngModel)]="element.description">
+		    </td>
+		</ng-container>
+
+		<ng-container matColumnDef="delete">
+		    <th mat-header-cell *matHeaderCellDef> Actions </th>
+		    <td mat-cell *matCellDef="let element"> 
+		    	<button mat-raised-button color="accent" (click)="onUpdate( element )">Update</button>
+		    	&nbsp;&nbsp;
+		    	<button mat-raised-button color="accent" (click)="onDelete( element._id)">Delete</button>
+		    </td>
+		</ng-container>
+	
+
+		<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  		<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+	</table>
+
+	<br>
+
+	<button mat-raised-button color="accent" (click)="onRefresh()">Search All</button>
+	&nbsp;&nbsp;
+	<button (click)="exportToExcel()" mat-raised-button color="accent" >Export To Excel</button>
+	
+
+</div>

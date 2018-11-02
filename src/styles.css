@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+
+.logoarea {
+  display: block;
+  font-size: xx-large;
+  color: white;
+  padding: 0.5em 0.5em 0.5em 0.5em;
+  background-color: #607D8B;
+  line-height: 1em;
+  position: relative;  
+  min-width: 16px;
+  text-align: center;
+  margin-right: .8em;
+  border-radius: 6px 0px 0px 6px;
+  width: auto;  
+}
+
