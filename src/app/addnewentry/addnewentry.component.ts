@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {FormBuilder, FormGroup, Validators, FormControl, NgForm} from '@angular/forms';
 import { PatientsService } from '../services/patients.service'
 import { Patients } from '../data/patients';
@@ -13,13 +13,17 @@ import { StatusCategories } from './statuscategories';
 })
 export class AddnewentryComponent implements OnInit {
 
+  @Output() editPatientDialogEvent = new EventEmitter<string>();
+  @Input() patientToEdit: Patients;
+  isExpanded: boolean = false;
+
 
 	patientInformation: FormGroup;
-   statusCategories: StatusCategories[] = [  
+   statusCategories: StatusCategories[] = [
       {category: 'Admitted'},
       {category: 'Discharged'}
     ];
-  	
+
   	/*patientFirstName: String;
   	patientMiddleName: String;
 	patientLastName: String;
@@ -28,16 +32,16 @@ export class AddnewentryComponent implements OnInit {
 	contactPersonNumber: String;
 	dateOfBirth: Date;*/
 
-	
 
-  	/*newPatient.patientFirstName = this.patientFirstName; 
+
+  	/*newPatient.patientFirstName = this.patientFirstName;
   	newPatient.patientMiddleName = this.patientMiddleName;
   	newPatient.patientLastName = this.patientLastName;
   	newPatient.address = this.address;
   	newPatient.*/
 
 
-  
+
   constructor(private fb: FormBuilder, private patientService: PatientsService) {
   		this.patientInformation = fb.group({
 		  	addmissionNo:[null, Validators.required],
@@ -53,13 +57,27 @@ export class AddnewentryComponent implements OnInit {
 		});
    }
 
-  ngOnInit() {  }
+  ngOnInit() {
+    if(this.patientToEdit){
+      this.patientInformation.patchValue({
+        addmissionNo: this.patientToEdit.addmissionNo  ,
+        patientFirstName: this.patientToEdit.patientFirstName,
+        patientMiddleName: this.patientToEdit.patientMiddleName,
+        patientLastName: this.patientToEdit.patientLastName,
+        address: this.patientToEdit.address,
+        contactPerson: this.patientToEdit.contactPerson,
+        contactPersonNumber: this.patientToEdit.contactPersonNumber,
+        dateOfBirth: this.patientToEdit.dateOfBirth
+      });
+      this.isExpanded= true;
+    }
+   }
 
-  onFormSubmit( )  
-  { 
+  onFormSubmit()
+  {
   	var newPatient = new Patients();
-  	newPatient.addmissionNo = this.patientInformation.get('addmissionNo').value; 
-    newPatient.patientFirstName = this.patientInformation.get('patientFirstName').value; 
+  	newPatient.addmissionNo = this.patientInformation.get('addmissionNo').value;
+    newPatient.patientFirstName = this.patientInformation.get('patientFirstName').value;
   	newPatient.patientMiddleName = this.patientInformation.get('patientMiddleName').value;
   	newPatient.patientLastName = this.patientInformation.get('patientLastName').value;
   	newPatient.address = this.patientInformation.get('address').value;
@@ -70,12 +88,32 @@ export class AddnewentryComponent implements OnInit {
     //newPatient.patientAddmissionStatus[0].status = this.patientInformation.get('status').value;
     //ewPatient.patientAddmissionStatus[0].dateOfStatusChange = this.patientInformation.get('dateOfStatusChange').value;;
 
-  	  
+
   	this.patientService.addPatient( newPatient ).subscribe(patients => newPatient = patients);
   	console.log('Before');
 
   	this.patientInformation.reset();
   	console.log('After');
-  } 
+  }
+
+
+  onUpdate( patient ){
+
+    var newPatient = new Patients();
+  	newPatient.addmissionNo = this.patientInformation.get('addmissionNo').value;
+    newPatient.patientFirstName = this.patientInformation.get('patientFirstName').value;
+  	newPatient.patientMiddleName = this.patientInformation.get('patientMiddleName').value;
+  	newPatient.patientLastName = this.patientInformation.get('patientLastName').value;
+  	newPatient.address = this.patientInformation.get('address').value;
+  	newPatient.contactPerson= this.patientInformation.get('contactPerson').value;
+  	newPatient.contactPersonNumber = this.patientInformation.get('contactPersonNumber').value;
+    newPatient.dateOfBirth = this.patientInformation.get('dateOfBirth').value;
+    var patientId = this.patientToEdit._id;
+    console.log( this.patientInformation.get('status').value);
+
+    this.patientService.updatePatient( newPatient, patientId.toString() ).subscribe();
+    this.editPatientDialogEvent.next();
+  }
+
 
 }

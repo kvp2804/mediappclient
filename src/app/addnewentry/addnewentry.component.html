@@ -1,6 +1,6 @@
 <div class="basic-container">
 	<mat-accordion>
-		<mat-expansion-panel>
+		<mat-expansion-panel [expanded]="isExpanded">
 			<mat-expansion-panel-header>
 				<mat-panel-title>
 					Enter personal details:
@@ -38,10 +38,10 @@
 			    <mat-form-field class='singleBlock'>
 			      <input matInput formControlName='contactPerson' placeholder="Contact Person Details">
 			    </mat-form-field>
-			    
+
 			    <mat-form-field class='singleBlock'>
 			      <input matInput formControlName='contactPersonNumber' placeholder="Contact Person Phone">
-			    </mat-form-field>
+          </mat-form-field>
 
 			    <br>
 
@@ -50,8 +50,8 @@
 				    <mat-option *ngFor="let statusCategory of statusCategories" [value]="statusCategory.category">
 				      {{statusCategory.category}}
 				    </mat-option>
-				  </mat-select>			      
-			    </mat-form-field>	
+				  </mat-select>
+			    </mat-form-field>
 
 				<mat-form-field>
 			      <input matInput formControlName='dateOfStatusChange' [matDatepicker]="picker1" placeholder="Date of Status Change">
@@ -60,10 +60,11 @@
 			    </mat-form-field>
 
 		    </form>
-		</mat-expansion-panel>	
+		</mat-expansion-panel>
 
 		<br>
 
-		<button mat-raised-button color="accent" [disabled]="!patientInformation.valid" (click)="onFormSubmit()">Submit</button>
+    <button mat-raised-button color="accent" *ngIf="!this.patientToEdit" [disabled]="!patientInformation.valid" (click)="onFormSubmit()">Submit</button>
+    <button mat-raised-button color="accent" *ngIf="this.patientToEdit" (click)="onUpdate()">Update</button>
 	</mat-accordion>
 </div>

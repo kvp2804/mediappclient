@@ -55,6 +55,8 @@ import { SearchexpensesComponent } from './expenseworkingarea/searchexpenses/sea
 import { IncomeworkingareaComponent } from './incomeworkingarea/incomeworkingarea.component';
 import { AddincomeentryComponent } from './incomeworkingarea/addincomeentry/addincomeentry.component';
 import { SearchincomeComponent } from './incomeworkingarea/searchincome/searchincome.component';
+import { EditpatientdialogComponent } from './editpatientdialog/editpatientdialog.component';
+
 
 @NgModule({
   declarations: [
@@ -67,7 +69,8 @@ import { SearchincomeComponent } from './incomeworkingarea/searchincome/searchin
     SearchexpensesComponent,
     IncomeworkingareaComponent,
     AddincomeentryComponent,
-    SearchincomeComponent
+    SearchincomeComponent,
+    EditpatientdialogComponent
   ],
   imports: [
     BrowserModule,

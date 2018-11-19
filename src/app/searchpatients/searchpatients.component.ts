@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import {MatDialog, MatDialogConfig} from "@angular/material";
 import { Patients } from '../data/patients';
 import {PatientsService} from '../services/patients.service';
+import {EditpatientdialogComponent} from "../editpatientdialog/editpatientdialog.component";
 
 @Component({
   selector: 'app-searchpatients',
@@ -12,7 +14,7 @@ export class SearchpatientsComponent implements OnInit {
 	displayedColumns: string[] = ['addmissionNo', 'patientFirstName', 'patientLastName', 'status', 'delete'];
 	dataSource: Patients[];
 
-  constructor( private patientService: PatientsService ) { }
+  constructor( private patientService: PatientsService, private dialog: MatDialog ) { }
 
   ngOnInit() {
 
@@ -28,38 +30,43 @@ export class SearchpatientsComponent implements OnInit {
 
   onRefresh() {
   	console.log('In onRefresh');
-  	this.patientService.getPatients().subscribe(dataSource => this.dataSource = dataSource);    
+  	this.patientService.getPatients().subscribe(dataSource => this.dataSource = dataSource);
   } ;
 
   onDelete( expenseID: string ){
-    this.patientService.deletePatient( expenseID ).subscribe();       
+    this.patientService.deletePatient( expenseID ).subscribe();
   }
 
   onUpdate( patient ){
-    var newPatient = new Patients();    
-    newPatient.patientFirstName = patient.patientFirstName; 
-    newPatient.patientMiddleName = patient.patientMiddleName;
-    newPatient.patientLastName = patient.patientLastName;
-    newPatient.address = patient.address;
-    newPatient.contactPerson= patient.contactPerson;
-    newPatient.contactPersonNumber = patient.contactPersonNumber;
-    newPatient.dateOfBirth = patient.dateOfBirth;
-    
-    //Get the data for this patient
-    for(var i = 0; i<this.dataSource.length; i++)
-    {
-       var value = this.dataSource[i]._id
-       if( value == patient._id )
-       {
-         /*if( patient.status != this.dataSource[i].status )
-         {
-             newPatient.status = patient.status;
-             newPatient.dateOfStatusChange = patient.dateOfStatusChange;             
-         }*/
-         break;
-       }
-    }
-    this.patientService.updatePatient( newPatient, patient._id ).subscribe();       
-  }  
+
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+
+    dialogConfig.data = {
+      patient: patient
+    };
+
+
+
+    const dialogRef = this.dialog.open(EditpatientdialogComponent,
+        dialogConfig);
+
+
+    dialogRef.afterClosed().subscribe(
+        val => {
+          console.log("Dialog output:", val);
+      for(var i =0 ; i<this.dataSource.length; i++) {
+if(val._id === this.dataSource[i]._id) {
+  this.dataSource[i] = val;
+  break;
+}
+      }}
+
+
+    );
+
+  }
 
 }
