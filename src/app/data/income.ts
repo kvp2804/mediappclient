@@ -4,6 +4,6 @@ export class Income {
 	incomeDate: Date;
 	description: String;
 	incomeCategory: String;
-	amount: Number;
+	amount: number;
 	_id: string;
 }

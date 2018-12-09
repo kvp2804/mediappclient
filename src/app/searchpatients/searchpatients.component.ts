@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {MatDialog, MatDialogConfig} from "@angular/material";
-import { Patients } from '../data/patients';
+import { Patients, PatientAddmissionStatus } from '../data/patients';
 import {PatientsService} from '../services/patients.service';
 import {EditpatientdialogComponent} from "../editpatientdialog/editpatientdialog.component";
 
@@ -12,7 +12,9 @@ import {EditpatientdialogComponent} from "../editpatientdialog/editpatientdialog
 export class SearchpatientsComponent implements OnInit {
 
 	displayedColumns: string[] = ['addmissionNo', 'patientFirstName', 'patientLastName', 'status', 'delete'];
-	dataSource: Patients[];
+	dataSource: Patients[];// = [];
+  dataSourcePatientStatus: PatientAddmissionStatus[];// = [];
+
 
   constructor( private patientService: PatientsService, private dialog: MatDialog ) { }
 
@@ -31,8 +33,42 @@ export class SearchpatientsComponent implements OnInit {
   onRefresh() {
   	console.log('In onRefresh');
   	this.patientService.getPatients().subscribe(dataSource => this.dataSource = dataSource);
+
+   //this.patientService.getPatients().subscribe(patients => this.populatePatientsdata(patients));
+    console.log(this.dataSource);
   } ;
 
+  populatePatientsdata(patients: Patients[]){
+
+    for(var i = 0; i<patients.length; i++) {
+
+
+       let patient: Patients = {        
+        addmissionNo: patients[i].addmissionNo,
+        patientFirstName:patients[i].patientFirstName,   
+        patientMiddleName: patients[i].patientMiddleName,
+        patientLastName: patients[i].patientLastName,
+        address: patients[i].address,
+        contactPerson: patients[i].contactPerson,
+        contactPersonNumber: patients[i].contactPersonNumber,
+        dateOfBirth: patients[i].dateOfBirth,
+        _id: patients[i]._id,
+        patientAddmissionStatus: patients[i].patientAddmissionStatus
+
+      };
+
+      this.dataSource.push( patient );      
+      
+      };
+
+      //this.expensors.push( expensor );
+      //console.log("Patient ID = " + this.expensors[i].value);
+      //console.log("Name = " + this.expensors[i].displayValue);
+
+    
+  };
+
+  
   onDelete( expenseID: string ){
     this.patientService.deletePatient( expenseID ).subscribe();
   }

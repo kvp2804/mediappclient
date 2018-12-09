@@ -4,6 +4,6 @@ export class Expenses {
 	expenseDate: Date;
 	description: String;
 	expenseCategory: String;
-	amount: Number;
+	amount: number;
 	_id: string;
 }

@@ -56,6 +56,7 @@ import { IncomeworkingareaComponent } from './incomeworkingarea/incomeworkingare
 import { AddincomeentryComponent } from './incomeworkingarea/addincomeentry/addincomeentry.component';
 import { SearchincomeComponent } from './incomeworkingarea/searchincome/searchincome.component';
 import { EditpatientdialogComponent } from './editpatientdialog/editpatientdialog.component';
+import { ReportworkingareaComponent } from './reportworkingarea/reportworkingarea.component';
 
 
 @NgModule({
@@ -70,7 +71,8 @@ import { EditpatientdialogComponent } from './editpatientdialog/editpatientdialo
     IncomeworkingareaComponent,
     AddincomeentryComponent,
     SearchincomeComponent,
-    EditpatientdialogComponent
+    EditpatientdialogComponent,
+    ReportworkingareaComponent
   ],
   imports: [
     BrowserModule,

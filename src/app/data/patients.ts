@@ -8,12 +8,14 @@ export class Patients {
 	contactPersonNumber: String;
 	dateOfBirth: Date;	
 	_id: String;
-	patientAddmissionStatus: [{
-			status: { type: String, default: 'Admitted' },
-			dateOfStatusChange: Date
-		}];	
-	
+	patientAddmissionStatus: PatientAddmissionStatus[];		
 }
+
+
+export class PatientAddmissionStatus {
+			status: { type: String, default: 'Admitted' };
+			dateOfStatusChange: Date
+		};
 
 
 
