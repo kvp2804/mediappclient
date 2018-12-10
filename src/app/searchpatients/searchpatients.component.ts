@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef  } from '@angular/core';
 import {MatDialog, MatDialogConfig} from "@angular/material";
 import { Patients, PatientAddmissionStatus } from '../data/patients';
 import {PatientsService} from '../services/patients.service';
@@ -16,7 +16,7 @@ export class SearchpatientsComponent implements OnInit {
   dataSourcePatientStatus: PatientAddmissionStatus[];// = [];
 
 
-  constructor( private patientService: PatientsService, private dialog: MatDialog ) { }
+  constructor( private patientService: PatientsService, private dialog: MatDialog, private changeDetectorRefs: ChangeDetectorRef ) { }
 
   ngOnInit() {
 
@@ -32,10 +32,17 @@ export class SearchpatientsComponent implements OnInit {
 
   onRefresh() {
   	console.log('In onRefresh');
-  	this.patientService.getPatients().subscribe(dataSource => this.dataSource = dataSource);
+    this.patientService.getPatients().subscribe(dataSource => {
+      this.dataSource = dataSource;
+      this.changeDetectorRefs.detectChanges();
+      console.log(this.dataSource);
+    });
+
+
+
 
    //this.patientService.getPatients().subscribe(patients => this.populatePatientsdata(patients));
-    console.log(this.dataSource);
+
   } ;
 
   populatePatientsdata(patients: Patients[]){
@@ -43,9 +50,9 @@ export class SearchpatientsComponent implements OnInit {
     for(var i = 0; i<patients.length; i++) {
 
 
-       let patient: Patients = {        
+       let patient: Patients = {
         addmissionNo: patients[i].addmissionNo,
-        patientFirstName:patients[i].patientFirstName,   
+        patientFirstName:patients[i].patientFirstName,
         patientMiddleName: patients[i].patientMiddleName,
         patientLastName: patients[i].patientLastName,
         address: patients[i].address,
@@ -57,18 +64,18 @@ export class SearchpatientsComponent implements OnInit {
 
       };
 
-      this.dataSource.push( patient );      
-      
+      this.dataSource.push( patient );
+
       };
 
       //this.expensors.push( expensor );
       //console.log("Patient ID = " + this.expensors[i].value);
       //console.log("Name = " + this.expensors[i].displayValue);
 
-    
+
   };
 
-  
+
   onDelete( expenseID: string ){
     this.patientService.deletePatient( expenseID ).subscribe();
   }
@@ -92,13 +99,15 @@ export class SearchpatientsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(
         val => {
-          console.log("Dialog output:", val);
-      for(var i =0 ; i<this.dataSource.length; i++) {
-if(val._id === this.dataSource[i]._id) {
-  this.dataSource[i] = val;
-  break;
-}
-      }}
+          //console.log("Dialog output:", val);
+      //for(var i =0 ; i<this.dataSource.length; i++) {
+//if(val._id === this.dataSource[i]._id) {
+  //this.dataSource[i] = val;
+  //break;
+//}
+     // }
+     this.onRefresh();
+    }
 
 
     );

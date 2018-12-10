@@ -16,6 +16,7 @@ export class AddnewentryComponent implements OnInit {
   @Output() editPatientDialogEvent = new EventEmitter<string>();
   @Input() patientToEdit: Patients;
   isExpanded: boolean = false;
+  displayedStatusColumns: string[] = ['status', 'dateOfStatusChange'];
 
 
 	patientInformation: FormGroup;
@@ -59,6 +60,7 @@ export class AddnewentryComponent implements OnInit {
 
   ngOnInit() {
     if(this.patientToEdit){
+      let statusLength : number =  this.patientToEdit.patientAddmissionStatus.length;
       this.patientInformation.patchValue({
         addmissionNo: this.patientToEdit.addmissionNo  ,
         patientFirstName: this.patientToEdit.patientFirstName,
@@ -67,7 +69,9 @@ export class AddnewentryComponent implements OnInit {
         address: this.patientToEdit.address,
         contactPerson: this.patientToEdit.contactPerson,
         contactPersonNumber: this.patientToEdit.contactPersonNumber,
-        dateOfBirth: this.patientToEdit.dateOfBirth
+        dateOfBirth: this.patientToEdit.dateOfBirth,
+        status: this.patientToEdit.patientAddmissionStatus[statusLength - 1].status,
+        dateOfStatusChange: this.patientToEdit.patientAddmissionStatus[statusLength - 1].dateOfStatusChange
       });
       this.isExpanded= true;
     }
@@ -86,8 +90,8 @@ export class AddnewentryComponent implements OnInit {
   	newPatient.dateOfBirth = this.patientInformation.get('dateOfBirth').value;
     console.log( this.patientInformation.get('status').value);
     var newPatient = new Patients();
-    newPatient.addmissionNo = this.patientInformation.get('addmissionNo').value; 
-    newPatient.patientFirstName = this.patientInformation.get('patientFirstName').value; 
+    newPatient.addmissionNo = this.patientInformation.get('addmissionNo').value;
+    newPatient.patientFirstName = this.patientInformation.get('patientFirstName').value;
     newPatient.patientMiddleName = this.patientInformation.get('patientMiddleName').value;
     newPatient.patientLastName = this.patientInformation.get('patientLastName').value;
     newPatient.address = this.patientInformation.get('address').value;
@@ -103,8 +107,8 @@ export class AddnewentryComponent implements OnInit {
 
     newPatient.patientAddmissionStatus = [];
     newPatient.patientAddmissionStatus.push( patientStatus );
-    
-      
+
+
     this.patientService.addPatient( newPatient ).subscribe(patients => newPatient = patients);
     console.log('Before');
 
@@ -125,9 +129,7 @@ export class AddnewentryComponent implements OnInit {
   	newPatient.contactPersonNumber = this.patientInformation.get('contactPersonNumber').value;
     newPatient.dateOfBirth = this.patientInformation.get('dateOfBirth').value;
 
-    console.log( "Status: " + document.getElementById('elmPatientAddmissionStatus').nodeValue);
-
-    if( document.getElementById('elmPatientAddmissionStatus').nodeValue != this.patientInformation.get('status').value )
+    if( !this.patientInformation.get('status').untouched )
     {
       let patientStatus: PatientAddmissionStatus = {
           status: this.patientInformation.get('status').value,
@@ -139,9 +141,11 @@ export class AddnewentryComponent implements OnInit {
     }
 
     var patientId = this.patientToEdit._id;
-    
-    this.patientService.updatePatient( newPatient, patientId.toString() ).subscribe();
-    this.editPatientDialogEvent.next();
+
+    this.patientService.updatePatient( newPatient, patientId.toString() ).subscribe(val => {
+      this.editPatientDialogEvent.next();
+    });
+
   }
 
 
