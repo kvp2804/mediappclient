@@ -46,7 +46,7 @@
 			    <br>
 
 			    <mat-form-field  class='singleBlock' id='elmPatientAddmissionStatus'>
-			      <mat-select formControlName='status' placeholder="Admission Status" id="elmPatientAddmissionStatus" [(value)]="selected" >
+			      <mat-select formControlName='status' placeholder="Admission Status" id="elmPatientAddmissionStatus" >
 				    <mat-option *ngFor="let statusCategory of statusCategories" [value]="statusCategory.category">
 				      {{statusCategory.category}}
 				    </mat-option>

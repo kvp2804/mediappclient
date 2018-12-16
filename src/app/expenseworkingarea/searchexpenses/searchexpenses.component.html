@@ -27,19 +27,19 @@
     <br>
     <br>
 
-	<table mat-table [dataSource]='dataSource' class='mat-elevation-z8' id='expenseTable'>
+	<table mat-table [dataSource]='dataSource' matSort 	class='mat-elevation-z8' id='expenseTable'>
 		<ng-container matColumnDef="expenseDate">
-		    <th mat-header-cell *matHeaderCellDef> Expense Date </th>
+		    <th mat-header-cell *matHeaderCellDef mat-sort-header> Expense Date </th>
 		    <td mat-cell *matCellDef="let element"> {{element.expenseDate}} </td>
 		</ng-container>
 
 		<ng-container matColumnDef="expenseFor">
-		    <th mat-header-cell *matHeaderCellDef> Patient Name </th>
-		    <td mat-cell *matCellDef="let element"> {{element.expenseFor.patientFirstName }} {{element.expenseFor.patientLastName}} </td>
+		    <th mat-header-cell *matHeaderCellDef mat-sort-header> Patient Name </th>
+		    <td mat-cell *matCellDef="let element"> {{element.expenseFor}} </td>
 		</ng-container>
 
 		<ng-container matColumnDef="expenseCategory">
-		    <th mat-header-cell *matHeaderCellDef> Expense Category </th>
+		    <th mat-header-cell *matHeaderCellDef mat-sort-header> Expense Category </th>
 		    <td mat-cell *matCellDef="let element"> 
 		    	<mat-select [(value)]="element.expenseCategory">
 					<mat-option *ngFor="let category of categories" [value]="category.category">
@@ -51,9 +51,11 @@
 		</ng-container>
 
 		<ng-container matColumnDef="amount">
-		    <th mat-header-cell *matHeaderCellDef> Expense Amount </th>
+		    <th mat-header-cell *matHeaderCellDef > Expense Amount </th>
 		    <td mat-cell *matCellDef="let element"> 
 		    	<input matInput [value]="element.amount" [(ngModel)]="element.amount">
+		    		
+		    	
 		    </td>
 		</ng-container>
 
@@ -61,6 +63,8 @@
 		    <th mat-header-cell *matHeaderCellDef> Description </th>
 		    <td mat-cell *matCellDef="let element">
 		    	<input matInput [value]="element.description" [(ngModel)]="element.description">
+		    		
+		    	
 		    </td>
 		</ng-container>
 

@@ -1,13 +1,12 @@
-<div class="closeButton">
-    <button type="button" aria-label="Close"   (click)="close()">
-        <span aria-hidden="true">&times;</span>
-      </button>
+<div class="basic-container">
+	<div class="closeButton">
+	    <button type="button" aria-label="Close"   (click)="close()">
+	        <span aria-hidden="true">&times;</span>
+	      </button>
+	</div>
+
+	<app-addnewentry [patientToEdit]="patientData" (editPatientDialogEvent)="close()"></app-addnewentry>
 </div>
-
-<app-addnewentry [patientToEdit]="patientData" (editPatientDialogEvent)="close()">
-
-
-</app-addnewentry>
 
 
 

@@ -47,12 +47,12 @@ export class AddnewentryComponent implements OnInit {
   		this.patientInformation = fb.group({
 		  	addmissionNo:[null, Validators.required],
         patientFirstName:[null, Validators.required],
-		  	patientMiddleName: [null, Validators.required],
+		  	patientMiddleName: [null],
 			  patientLastName: [null, Validators.required],
 			  address: [null, Validators.required],
 			  contactPerson: [null, Validators.required],
 			  contactPersonNumber: [null, Validators.required],
-			  dateOfBirth: [null, Validators.required],
+			  dateOfBirth: [null],
         status: [null, Validators.required],
         dateOfStatusChange: [null, Validators.required]
 		});

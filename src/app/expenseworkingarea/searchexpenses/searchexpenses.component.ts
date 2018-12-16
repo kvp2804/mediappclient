@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { ViewEncapsulation } from '@angular/core';
 import { Patients } from '../../data/patients';
 import { Expenses } from '../../data/expenses';
@@ -8,6 +8,8 @@ import { ExpenseCategories } from './expensecategories';
 import {FormBuilder, FormGroup, Validators, FormControl, NgForm} from '@angular/forms';
 import { Expensors } from './expensors';
 import * as XLSX from 'xlsx';
+import {MatSort, MatTableDataSource} from '@angular/material';
+import {ExpensesForView} from './expenseforview';
 
 @Component({
   selector: 'app-searchexpenses',
@@ -21,10 +23,19 @@ export class SearchexpensesComponent implements OnInit {
   expenseSearchForm: FormGroup;
   expenses : Expenses[];
 	displayedColumns: string[] = ['expenseDate', 'expenseFor', 'expenseCategory', 'amount', 'description', 'delete'];
-	dataSource: Expenses[];
+  displayedColumnsToTableHeaderMapping = {
+    'expenseDate':'Expense Date',
+    'expenseFor':'Patient Name',
+    'expenseCategory':'Expense Category',
+    'amount':'Amount',
+    'description':'Description'
+    };
+	dataSourceFromServer: Expenses[];
+  dataSourceRaw: ExpensesForView[];
   EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
   EXCEL_EXTENSION = '.xlsx';
-
+  dataSource = new MatTableDataSource(this.dataSourceRaw);
+  @ViewChild(MatSort) sort: MatSort;
 
   categories: ExpenseCategories[] = [  
       {category: 'Cash Advances'},
@@ -44,7 +55,7 @@ export class SearchexpensesComponent implements OnInit {
 
   ngOnInit() {
   		//this.getExpensesData();
-      this.getPatientData();
+      this.getPatientData();      
   }
 
   getPatientData() {
@@ -65,20 +76,56 @@ export class SearchexpensesComponent implements OnInit {
       this.expensors.push( expensor );
       console.log("Patient ID = " + this.expensors[i].value);
       console.log("Name = " + this.expensors[i].displayValue);
-
     }
   };
 
-  getExpensesData() {
+  /*getExpensesData() {
   	console.log('In getExpensesData');
   	this.expensesService.getExpenses().subscribe(dataSource => this.dataSource = dataSource);
   	console.log(this.dataSource);
-  } ;
+  } ;*/
 
   onRefresh() {
   	console.log('In onRefresh');
-  	this.expensesService.getExpenses().subscribe(dataSource => this.dataSource = dataSource);
+  	this.expensesService.getExpenses().subscribe(dataSourceFromServer => this.populateExpenseData( dataSourceFromServer ));
   } ;
+
+  populateExpenseData(expensesFromServer: Expenses[]){
+
+    console.log( expensesFromServer );
+
+    this.dataSourceRaw = [];
+    for(var i = 0; i<expensesFromServer.length; i++) {
+
+        //patient name can be null
+        var patientName;
+        if( expensesFromServer[i].expenseFor == null )
+        {
+          patientName = "";
+        }
+        else
+        {
+           patientName = expensesFromServer[i].expenseFor.patientFirstName + " " + expensesFromServer[i].expenseFor.patientLastName
+        }
+
+      this.dataSourceRaw[i] = {
+          expenseFor: patientName,
+          dateOfEntry: expensesFromServer[i].dateOfEntry,
+          expenseDate: expensesFromServer[i].expenseDate,
+          description: expensesFromServer[i].description,
+          expenseCategory: expensesFromServer[i].expenseCategory,
+          amount: expensesFromServer[i].amount,
+          _id: expensesFromServer[i]._id
+      }                 
+    }    
+
+    this.dataSource = new MatTableDataSource(this.dataSourceRaw);
+    this.dataSource.sort = this.sort;
+
+    console.log(JSON.stringify(this.dataSourceRaw));
+    console.log(this.dataSource);
+
+  }; 
 
   onDelete( expenseID: string ){
   	this.expensesService.deleteExpense( expenseID ).subscribe();       
@@ -131,27 +178,41 @@ export class SearchexpensesComponent implements OnInit {
     if( whichServiceToExecute === "SearchExpenseByPatientSpecificDates" )
     {
       this.expensesService.getExpensebyDateForSpecificpatient(this.expenseSearchForm.get('searchPatientId').value, this.expenseSearchForm.get('searchStartDate').value, searchByEndDate )
-        .subscribe(dataSource => this.dataSource = dataSource);
+        .subscribe(dataSourceFromServer => this.populateExpenseData( dataSourceFromServer ));
     }
     else if( whichServiceToExecute === "SearchExpenseByPatientAllDates")
     {
       this.expensesService.getExpenseBySpecificPatient(this.expenseSearchForm.get('searchPatientId').value)
-        .subscribe(dataSource => this.dataSource = dataSource);
+        .subscribe(dataSourceFromServer => this.populateExpenseData( dataSourceFromServer ));
     }
     else if( whichServiceToExecute === "SearchExpenseForAllPatientsSpecificDates")
     {
       this.expensesService.getExpensebyDateForAllPatient(this.expenseSearchForm.get('searchStartDate').value, searchByEndDate )
-        .subscribe(dataSource => this.dataSource = dataSource);
+        .subscribe(dataSourceFromServer => this.populateExpenseData( dataSourceFromServer ));
     }
- }
+ } 
+
 
   exportToExcel() {
-      this.export(this.expenses, "expenses");
+      this.export("expenses");
    }
 
 
-   export(json: any[], excelFileName: string) {
-    const worksheet: XLSX.WorkSheet = XLSX.utils.table_to_sheet(document.getElementById('expenseTable'));
+   export(excelFileName: string) {
+    var excelOutputJson = [];
+    for(var i = 0; i< this.dataSourceRaw.length; i++){
+      var data=this.dataSourceRaw[i];
+      var output={};
+      for(var j = 0; j < this.displayedColumns.length; j++){
+        if (this.displayedColumns[j] !== "delete") {
+          var actualColumnHeader = this.displayedColumnsToTableHeaderMapping[this.displayedColumns[j]];
+          output[actualColumnHeader] = data[this.displayedColumns[j]];
+        }
+      }
+      excelOutputJson.push(output);
+    }
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(excelOutputJson);
+
     const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
     XLSX.writeFile(workbook, excelFileName + '_export_' + new Date().getTime() + this.EXCEL_EXTENSION);
 

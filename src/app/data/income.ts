@@ -1,5 +1,9 @@
 export class Income {
-	incomeFor: String;
+	incomeFor: {
+			_id: String
+			patientFirstName: String,
+			patientLastName: String
+		};
 	dateOfEntry: Date;
 	incomeDate: Date;
 	description: String;

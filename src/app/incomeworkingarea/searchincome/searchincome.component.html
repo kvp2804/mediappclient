@@ -27,19 +27,19 @@
     <br>
     <br>
 
-	<table mat-table [dataSource]='dataSource' class='mat-elevation-z8' id='expenseTable'>
+	<table mat-table [dataSource]='dataSource' matSort class='mat-elevation-z8' id='expenseTable'>
 		<ng-container matColumnDef="incomeDate">
-		    <th mat-header-cell *matHeaderCellDef> Income Date </th>
+		    <th mat-header-cell *matHeaderCellDef mat-sort-header > Income Date </th>
 		    <td mat-cell *matCellDef="let element"> {{element.incomeDate}} </td>
 		</ng-container>
 
 		<ng-container matColumnDef="incomeFor">
-		    <th mat-header-cell *matHeaderCellDef> Patient Name </th>
-		    <td mat-cell *matCellDef="let element"> {{element.incomeFor.patientFirstName }} {{element.incomeFor.patientLastName}} </td>
+		    <th mat-header-cell *matHeaderCellDef mat-sort-header> Patient Name </th>
+		    <td mat-cell *matCellDef="let element"> {{element.incomeFor}} </td>
 		</ng-container>
 
 		<ng-container matColumnDef="incomeCategory">
-		    <th mat-header-cell *matHeaderCellDef> Income Category </th>
+		    <th mat-header-cell *matHeaderCellDef mat-sort-header> Income Category </th>
 		    <td mat-cell *matCellDef="let element"> 
 		    	<mat-select [(value)]="element.incomeCategory">
 					<mat-option *ngFor="let category of categories" [value]="category.category">

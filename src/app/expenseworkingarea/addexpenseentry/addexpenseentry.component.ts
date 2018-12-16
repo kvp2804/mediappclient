@@ -18,8 +18,7 @@ export class AddexpenseentryComponent implements OnInit {
 	    {category: 'Cash Advances'},
 	    {category: 'Medicines'},
 	    {category: 'Meals and snacks'},
-	    {category: 'Household'},
-	    {category: 'MISC'}
+	    {category: 'Household'}
   	];
 
   	expensors : Expensors[] = []; 

@@ -15,10 +15,10 @@ import { Income } from '../../data/income';
 export class AddincomeentryComponent implements OnInit {
 
 	categories: IncomeCategories[] = [	
-	    {category: 'Cash Advances'},
-	    {category: 'Medicines'},
-	    {category: 'Meals and snacks'},
-	    {category: 'Household'}
+	    {category: 'Cash'},
+	    {category: 'Bank Transfer'},
+	    {category: 'Donations'},
+	    {category: 'MISC'}
   	];
 
   	incomesors : Incomesors[] = []; 
