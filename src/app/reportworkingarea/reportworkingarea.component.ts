@@ -10,6 +10,9 @@ import { IncomeService } from '../services/income.service';
 import { ExpensesService } from '../services/expenses.service';
 import { Patients } from '../data/patients';
 import * as XLSX from 'xlsx';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
+import {MatSort, MatTableDataSource} from '@angular/material';
 
 @Component({
   selector: 'app-reportworkingarea',
@@ -19,6 +22,7 @@ import * as XLSX from 'xlsx';
 })
 export class ReportworkingareaComponent implements OnInit {
 
+  transactorSelectControl = new FormControl();
 	transactors : Transactors[] = [];
 	generateReportForm: FormGroup;
 
@@ -28,9 +32,10 @@ export class ReportworkingareaComponent implements OnInit {
   	EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
   	EXCEL_EXTENSION = '.xlsx';
 
-  	displayedColumns: string[] = ['expenseDate', 'expenseCategory', 'expenseAmount', 'incomeDate', 'incomeCategory', 'incomeAmount'];
+    displayedColumns: string[] = ['expenseDate', 'expenseCategory', 'expenseAmount', 'incomeDate', 'incomeCategory', 'incomeAmount'];
+    filteredTransactorOptions: Observable<Transactors[]>;
 
-  constructor(private fb: FormBuilder, private patientService: PatientsService, private incomeService: IncomeService, private expensesService: ExpensesService) { 
+  constructor(private fb: FormBuilder, private patientService: PatientsService, private incomeService: IncomeService, private expensesService: ExpensesService) {
   	this.generateReportForm = fb.group({
       searchPatientId:[null],
       searchStartDate: [null],
@@ -41,7 +46,24 @@ export class ReportworkingareaComponent implements OnInit {
   }
 
   ngOnInit() {
-  	this.getPatientData();
+    this.getPatientData();
+    this.filteredTransactorOptions = this.transactorSelectControl.valueChanges
+    .pipe(
+      startWith(''),
+      map(value => this._filter(value))
+    );
+  }
+
+  AutoCompleteDisplay(transactor: any): string {
+    if (transactor == undefined) { return }
+    return transactor.displayValue;
+  }
+
+  private _filter(value: string): Transactors[] {
+    const filterValue = value.toLowerCase();
+    return this.transactors.filter(function(el) {
+      return el.displayValue.toLowerCase().includes(filterValue);
+  });
   }
 
   getPatientData() {
@@ -53,7 +75,7 @@ export class ReportworkingareaComponent implements OnInit {
 
     for(var i = 0; i<patients.length; i++) {
 
-      let transactor: Transactors = {        
+      let transactor: Transactors = {
         value: patients[i]._id,
         displayValue: patients[i].patientFirstName + " " + patients[i].patientLastName
       };
@@ -68,10 +90,10 @@ export class ReportworkingareaComponent implements OnInit {
 
   onGenerateReport() {
 
-  	console.log("In the report section")  	
+  	console.log("In the report section")
 
-  	//End date should be selected one or today's date 
-  	var searchByEndDate = null;  	
+  	//End date should be selected one or today's date
+  	var searchByEndDate = null;
 
   	if( this.generateReportForm.get('searchEndDate').value != null )
   	{
@@ -80,21 +102,23 @@ export class ReportworkingareaComponent implements OnInit {
   	else
   	{
   		searchByEndDate = Date.now();
-  	}
-  	
+    }
+
+    var transactor = this.transactorSelectControl.value;
+
   	//Patient selection is mandatory
-  	if( this.generateReportForm.get('searchPatientId').value != null )
+  	if( transactor != null &&  transactor != "")
   	{
-  		
+
   		//Get the income details of the selected patient.
-  		this.incomeService.getIncomebyDateForSpecificpatient(this.generateReportForm.get('searchPatientId').value, this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+  		this.incomeService.getIncomebyDateForSpecificpatient(transactor.value, this.generateReportForm.get('searchStartDate').value, searchByEndDate )
         .subscribe(incomedataSource => {
         	console.log("I am here 1");
         	this.incomedataSource = incomedataSource
         });
-        
+
   		//Get the income details of the selected patient.
-  		this.expensesService.getExpensebyDateForSpecificpatient(this.generateReportForm.get('searchPatientId').value, this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+  		this.expensesService.getExpensebyDateForSpecificpatient(transactor.value, this.generateReportForm.get('searchStartDate').value, searchByEndDate )
         .subscribe(expensedataSource =>{
         	console.log("I am here 2");
         	this.expensedataSource = expensedataSource;
@@ -130,7 +154,7 @@ export class ReportworkingareaComponent implements OnInit {
 		    		totalExpense = totalExpense + patientLedger.expenseAmount;
 		    	}
 
-		    	
+
 
 		    	if( dataProcessed )
 		    	{
@@ -147,8 +171,8 @@ export class ReportworkingareaComponent implements OnInit {
 				    patientLedger.incomeAmount = totalIncome;
 				    this.dataSource.push(patientLedger);
 		    		break;
-		    	}    	
-		    }  
+		    	}
+		    }
 
 
 

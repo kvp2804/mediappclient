@@ -25,22 +25,6 @@ export class AddnewentryComponent implements OnInit {
       {category: 'Discharged'}
     ];
 
-  	/*patientFirstName: String;
-  	patientMiddleName: String;
-	patientLastName: String;
-	address: String;
-	contactPerson: String;
-	contactPersonNumber: String;
-	dateOfBirth: Date;*/
-
-
-
-  	/*newPatient.patientFirstName = this.patientFirstName;
-  	newPatient.patientMiddleName = this.patientMiddleName;
-  	newPatient.patientLastName = this.patientLastName;
-  	newPatient.address = this.address;
-  	newPatient.*/
-
 
 
   constructor(private fb: FormBuilder, private patientService: PatientsService) {

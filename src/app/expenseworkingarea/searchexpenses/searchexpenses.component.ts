@@ -8,8 +8,11 @@ import { ExpenseCategories } from './expensecategories';
 import {FormBuilder, FormGroup, Validators, FormControl, NgForm} from '@angular/forms';
 import { Expensors } from './expensors';
 import * as XLSX from 'xlsx';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 import {MatSort, MatTableDataSource} from '@angular/material';
 import {ExpensesForView} from './expenseforview';
+
 
 @Component({
   selector: 'app-searchexpenses',
@@ -18,7 +21,7 @@ import {ExpensesForView} from './expenseforview';
   encapsulation: ViewEncapsulation.None
 })
 export class SearchexpensesComponent implements OnInit {
-
+  expensorSelectControl = new FormControl();
   expensors : Expensors[] = [];
   expenseSearchForm: FormGroup;
   expenses : Expenses[];
@@ -36,15 +39,17 @@ export class SearchexpensesComponent implements OnInit {
   EXCEL_EXTENSION = '.xlsx';
   dataSource = new MatTableDataSource(this.dataSourceRaw);
   @ViewChild(MatSort) sort: MatSort;
+  filteredExpensorOptions: Observable<Expensors[]>;
 
-  categories: ExpenseCategories[] = [  
+  categories: ExpenseCategories[] = [
       {category: 'Cash Advances'},
       {category: 'Medicines'},
       {category: 'Meals and snacks'},
-      {category: 'Household'}
+      {category: 'Household'},
+      {category: 'MISC'}
     ];
 
-  constructor( private fb: FormBuilder, private patientService: PatientsService, private expensesService: ExpensesService ) { 
+  constructor( private fb: FormBuilder, private patientService: PatientsService, private expensesService: ExpensesService ) {
     this.expenseSearchForm = fb.group({
       searchPatientId:[null],
       searchStartDate: [null],
@@ -55,7 +60,26 @@ export class SearchexpensesComponent implements OnInit {
 
   ngOnInit() {
   		//this.getExpensesData();
-      this.getPatientData();      
+      this.getPatientData();
+
+      this.filteredExpensorOptions = this.expensorSelectControl.valueChanges
+      .pipe(
+        startWith(''),
+        map(value => this._filter(value))
+      );
+  }
+
+  AutoCompleteDisplay(expensor: any): string {
+    if (expensor == undefined) { return }
+    return expensor.displayValue;
+  }
+
+  private _filter(value: string): Expensors[] {
+    const filterValue = value.toLowerCase();
+
+    return this.expensors.filter(function(el) {
+      return el.displayValue.toLowerCase().includes(filterValue);
+  });
   }
 
   getPatientData() {
@@ -68,7 +92,7 @@ export class SearchexpensesComponent implements OnInit {
 
     for(var i = 0; i<patients.length; i++) {
 
-      let expensor: Expensors = {        
+      let expensor: Expensors = {
         value: patients[i]._id,
         displayValue: patients[i].patientFirstName + " " + patients[i].patientLastName
       };
@@ -116,8 +140,8 @@ export class SearchexpensesComponent implements OnInit {
           expenseCategory: expensesFromServer[i].expenseCategory,
           amount: expensesFromServer[i].amount,
           _id: expensesFromServer[i]._id
-      }                 
-    }    
+      }
+    }
 
     this.dataSource = new MatTableDataSource(this.dataSourceRaw);
     this.dataSource.sort = this.sort;
@@ -125,25 +149,26 @@ export class SearchexpensesComponent implements OnInit {
     console.log(JSON.stringify(this.dataSourceRaw));
     console.log(this.dataSource);
 
-  }; 
+  };
 
   onDelete( expenseID: string ){
-  	this.expensesService.deleteExpense( expenseID ).subscribe();       
+  	this.expensesService.deleteExpense( expenseID ).subscribe();
   }
 
   onUpdate( expense ){
-    var newExpense = new Expenses();    
+    var newExpense = new Expenses();
     newExpense.description = expense.description;
     newExpense.amount= expense.amount;
     newExpense.expenseCategory = expense.expenseCategory;
-    this.expensesService.updateExpense( newExpense, expense._id ).subscribe();       
+    this.expensesService.updateExpense( newExpense, expense._id ).subscribe();
   }
 
   onExpenseSearch() {
     var whichServiceToExecute = new String();
     var searchByEndDate = this.expenseSearchForm.get('searchEndDate').value;
+    var expensor = this.expensorSelectControl.value;
 
-    if( this.expenseSearchForm.get('searchPatientId').value == null )
+    if( expensor == null || expensor == "" )
     {
       if( this.expenseSearchForm.get('searchStartDate').value == null )
       {
@@ -173,16 +198,16 @@ export class SearchexpensesComponent implements OnInit {
 
         whichServiceToExecute = 'SearchExpenseByPatientSpecificDates';
       }
-    } 
-    
+    }
+
     if( whichServiceToExecute === "SearchExpenseByPatientSpecificDates" )
     {
-      this.expensesService.getExpensebyDateForSpecificpatient(this.expenseSearchForm.get('searchPatientId').value, this.expenseSearchForm.get('searchStartDate').value, searchByEndDate )
+      this.expensesService.getExpensebyDateForSpecificpatient(expensor.value, this.expenseSearchForm.get('searchStartDate').value, searchByEndDate )
         .subscribe(dataSourceFromServer => this.populateExpenseData( dataSourceFromServer ));
     }
     else if( whichServiceToExecute === "SearchExpenseByPatientAllDates")
     {
-      this.expensesService.getExpenseBySpecificPatient(this.expenseSearchForm.get('searchPatientId').value)
+      this.expensesService.getExpenseBySpecificPatient(expensor.value)
         .subscribe(dataSourceFromServer => this.populateExpenseData( dataSourceFromServer ));
     }
     else if( whichServiceToExecute === "SearchExpenseForAllPatientsSpecificDates")
@@ -190,7 +215,7 @@ export class SearchexpensesComponent implements OnInit {
       this.expensesService.getExpensebyDateForAllPatient(this.expenseSearchForm.get('searchStartDate').value, searchByEndDate )
         .subscribe(dataSourceFromServer => this.populateExpenseData( dataSourceFromServer ));
     }
- } 
+ }
 
 
   exportToExcel() {

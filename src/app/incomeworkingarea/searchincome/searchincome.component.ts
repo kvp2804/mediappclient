@@ -8,6 +8,8 @@ import { PatientsService } from '../../services/patients.service';
 import { IncomeService } from '../../services/income.service';
 import { Patients } from '../../data/patients';
 import * as XLSX from 'xlsx';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 import {MatSort, MatTableDataSource} from '@angular/material';
 import {IncomeForView} from './incomeforview';
 
@@ -19,6 +21,7 @@ import {IncomeForView} from './incomeforview';
 })
 export class SearchincomeComponent implements OnInit {
 
+  incomesorSelectControl = new FormControl();
   incomesors : Incomesors[] = [];
   incomeSearchForm: FormGroup;
   income : Income[];
@@ -36,15 +39,16 @@ export class SearchincomeComponent implements OnInit {
   EXCEL_EXTENSION = '.xlsx';
   dataSource = new MatTableDataSource(this.dataSourceRaw);
   @ViewChild(MatSort) sort: MatSort;
+  filteredIncomesorOptions: Observable<Incomesors[]>;
 
-  categories: IncomeCategories[] = [  
+  categories: IncomeCategories[] = [
       {category: 'Cash'},
       {category: 'Bank Transfer'},
       {category: 'Donations'},
       {category: 'MISC'}
     ];
 
-  constructor( private fb: FormBuilder, private patientService: PatientsService, private incomeService: IncomeService ) { 
+  constructor( private fb: FormBuilder, private patientService: PatientsService, private incomeService: IncomeService ) {
   	this.incomeSearchForm = fb.group({
       searchPatientId:[null],
       searchStartDate: [null],
@@ -55,7 +59,27 @@ export class SearchincomeComponent implements OnInit {
 
   ngOnInit() {
 
-  	this.getPatientData();
+    this.getPatientData();
+
+
+  this.filteredIncomesorOptions = this.incomesorSelectControl.valueChanges
+    .pipe(
+      startWith(''),
+      map(value => this._filter(value))
+    );
+  }
+
+  AutoCompleteDisplay(incomesor: any): string {
+    if (incomesor == undefined) { return }
+    return incomesor.displayValue;
+  }
+
+  private _filter(value: string): Incomesors[] {
+    const filterValue = value.toLowerCase();
+
+    return this.incomesors.filter(function(el) {
+      return el.displayValue.toLowerCase().includes(filterValue);
+  });
   }
 
   getPatientData() {
@@ -67,7 +91,7 @@ export class SearchincomeComponent implements OnInit {
 
     for(var i = 0; i<patients.length; i++) {
 
-      let incomesor: Incomesors = {        
+      let incomesor: Incomesors = {
         value: patients[i]._id,
         displayValue: patients[i].patientFirstName + " " + patients[i].patientLastName
       };
@@ -115,8 +139,8 @@ export class SearchincomeComponent implements OnInit {
           incomeCategory: incomeFromServer[i].incomeCategory,
           amount: incomeFromServer[i].amount,
           _id: incomeFromServer[i]._id
-      }                 
-    }    
+      }
+    }
 
     this.dataSource = new MatTableDataSource(this.dataSourceRaw);
     this.dataSource.sort = this.sort;
@@ -124,25 +148,26 @@ export class SearchincomeComponent implements OnInit {
     console.log(JSON.stringify(this.dataSourceRaw));
     console.log(this.dataSource);
 
-  }; 
+  };
 
   onDelete( incomeID: string ){
-  	this.incomeService.deleteIncome( incomeID ).subscribe();       
+  	this.incomeService.deleteIncome( incomeID ).subscribe();
   }
 
   onUpdate( income ){
-    var newIncome = new Income();    
+    var newIncome = new Income();
     newIncome.description = income.description;
     newIncome.amount= income.amount;
     newIncome.incomeCategory = income.incomeCategory;
-    this.incomeService.updateIncome( newIncome, income._id ).subscribe();       
+    this.incomeService.updateIncome( newIncome, income._id ).subscribe();
   }
 
   onIncomeSearch() {
   	var whichServiceToExecute = new String();
-  	var searchByEndDate = this.incomeSearchForm.get('searchEndDate').value;
+    var searchByEndDate = this.incomeSearchForm.get('searchEndDate').value;
+    var incomesor = this.incomesorSelectControl.value;
 
-  	if( this.incomeSearchForm.get('searchPatientId').value == null )
+  	if( incomesor == null || incomesor == "" )
   	{
   		if( this.incomeSearchForm.get('searchStartDate').value == null )
 	  	{
@@ -172,20 +197,20 @@ export class SearchincomeComponent implements OnInit {
 
 	  		whichServiceToExecute = 'SearchIncomeByPatientSpecificDates';
 	  	}
-  	} 
-  	
+  	}
+
   	if( whichServiceToExecute === "SearchIncomeByPatientSpecificDates" )
   	{
       console.log("In SearchIncomeByPatientSpecificDates");
-  		this.incomeService.getIncomebyDateForSpecificpatient(this.incomeSearchForm.get('searchPatientId').value, this.incomeSearchForm.get('searchStartDate').value, searchByEndDate )
+  		this.incomeService.getIncomebyDateForSpecificpatient(incomesor.value, this.incomeSearchForm.get('searchStartDate').value, searchByEndDate )
         .subscribe(dataSourceFromServer => this.populateIncomeData( dataSourceFromServer ));
   	}
   	else if( whichServiceToExecute === "SearchIncomeByPatientAllDates")
   	{
       console.log("In SearchIncomeByPatientAllDates");
-      console.log(this.incomeSearchForm.get('searchPatientId').value);
+      console.log(incomesor.value);
 
-  		this.incomeService.getIncomeBySpecificPatient(this.incomeSearchForm.get('searchPatientId').value)
+  		this.incomeService.getIncomeBySpecificPatient(incomesor.value)
         .subscribe(dataSourceFromServer => this.populateIncomeData( dataSourceFromServer ));
   	}
   	else if( whichServiceToExecute === "SearchIncomeForAllPatientsSpecificDates")
@@ -194,7 +219,7 @@ export class SearchincomeComponent implements OnInit {
   		this.incomeService.getIncomebyDateForAllPatient(this.incomeSearchForm.get('searchStartDate').value, searchByEndDate )
         .subscribe(dataSourceFromServer => this.populateIncomeData( dataSourceFromServer ));
   	}
- } 
+ }
 
   exportToExcel() {
       this.export("expenses");
