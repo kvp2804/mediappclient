@@ -10,6 +10,7 @@ export class Expenses {
 	expenseDate: Date;
 	description: String;
 	expenseCategory: String;
+	expenseSource: String;
 	amount: number;
 	_id: String;
 }

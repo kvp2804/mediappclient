@@ -4,6 +4,7 @@ export interface ExpensesForView {
 	expenseDate: Date;
 	description: String;
 	expenseCategory: String;
+	expenseSource: String;
 	amount: Number;
 	_id: String;
 }

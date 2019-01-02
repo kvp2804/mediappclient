@@ -4,7 +4,7 @@ import { Patients } from '../../data/patients';
 import { Expenses } from '../../data/expenses';
 import { PatientsService } from '../../services/patients.service';
 import { ExpensesService } from '../../services/expenses.service';
-import { ExpenseCategories } from './expensecategories';
+import { ExpenseCategories, ExpenseSource } from './expensecategories';
 import {FormBuilder, FormGroup, Validators, FormControl, NgForm} from '@angular/forms';
 import { Expensors } from './expensors';
 import * as XLSX from 'xlsx';
@@ -25,11 +25,12 @@ export class SearchexpensesComponent implements OnInit {
   expensors : Expensors[] = [];
   expenseSearchForm: FormGroup;
   expenses : Expenses[];
-	displayedColumns: string[] = ['expenseDate', 'expenseFor', 'expenseCategory', 'amount', 'description', 'delete'];
+	displayedColumns: string[] = ['expenseDate', 'expenseFor', 'expenseCategory', 'expenseSource', 'amount', 'description', 'delete'];
   displayedColumnsToTableHeaderMapping = {
     'expenseDate':'Expense Date',
     'expenseFor':'Patient Name',
     'expenseCategory':'Expense Category',
+    'expenseSource':'Expense Source',
     'amount':'Amount',
     'description':'Description'
     };
@@ -45,8 +46,16 @@ export class SearchexpensesComponent implements OnInit {
       {category: 'Cash Advances'},
       {category: 'Medicines'},
       {category: 'Meals and snacks'},
-      {category: 'Household'},
+      {category: 'Fees'},
+      {category: 'Inventory'},
       {category: 'MISC'}
+    ];
+
+   sources: ExpenseSource[] = [  
+      { source: 'Peti Cash' },
+      { source: 'Cash' },
+      { source: 'Journal Entries' },
+      { source: 'Bank Transfer' }
     ];
 
   constructor( private fb: FormBuilder, private patientService: PatientsService, private expensesService: ExpensesService ) {
@@ -138,6 +147,7 @@ export class SearchexpensesComponent implements OnInit {
           expenseDate: expensesFromServer[i].expenseDate,
           description: expensesFromServer[i].description,
           expenseCategory: expensesFromServer[i].expenseCategory,
+          expenseSource: expensesFromServer[i].expenseSource,
           amount: expensesFromServer[i].amount,
           _id: expensesFromServer[i]._id
       }
@@ -160,6 +170,8 @@ export class SearchexpensesComponent implements OnInit {
     newExpense.description = expense.description;
     newExpense.amount= expense.amount;
     newExpense.expenseCategory = expense.expenseCategory;
+    newExpense.expenseSource = expense.expenseSource;
+    newExpense.expenseSource = expense.expenseSource;
     this.expensesService.updateExpense( newExpense, expense._id ).subscribe();
   }
 

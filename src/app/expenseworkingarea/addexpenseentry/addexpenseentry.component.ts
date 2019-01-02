@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ExpenseCategories } from './expensecategories';
+import { ExpenseCategories, ExpenseSource } from './expensecategories';
 import {FormBuilder, FormGroup, Validators, FormControl, NgForm} from '@angular/forms';
 import { PatientsService } from '../../services/patients.service';
 import { Expensors } from './expensors';
@@ -18,7 +18,16 @@ export class AddexpenseentryComponent implements OnInit {
 	    {category: 'Cash Advances'},
 	    {category: 'Medicines'},
 	    {category: 'Meals and snacks'},
-	    {category: 'Household'}
+	    {category: 'Fees'},
+		{category: 'Inventory'},
+		{category: 'MISC'}
+  	];
+
+  	sources: ExpenseSource[] = [	
+	    { source: 'Peti Cash' },
+	    { source: 'Cash' },
+	    { source: 'Journal Entries' },
+	    { source: 'Bank Transfer' }		
   	];
 
   	expensors : Expensors[] = []; 
@@ -31,6 +40,7 @@ export class AddexpenseentryComponent implements OnInit {
 		  	dateOfExpense: [null, Validators.required],
 			description: [null, Validators.required],
 			expenseCategory: [null, Validators.required],
+			expenseSource: [null, Validators.required],
 			amount: [null, Validators.required]
 		});
    }
@@ -64,6 +74,7 @@ export class AddexpenseentryComponent implements OnInit {
 	  	newExpense.description = this.expenseData.get('description').value;
 	  	newExpense.amount= this.expenseData.get('amount').value;
 	  	newExpense.expenseCategory = this.expenseData.get('expenseCategory').value;
+	  	newExpense.expenseSource = this.expenseData.get('expenseSource').value;
 	  		  	  
 		this.expenseService.addExpense( newExpense ).subscribe(expense => newExpense = expense);
 		console.log('Before');

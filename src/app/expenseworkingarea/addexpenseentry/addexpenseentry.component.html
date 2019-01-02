@@ -25,6 +25,14 @@
 				  </mat-select>			      
 			    </mat-form-field>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<mat-form-field  class='matForField'>
+			      <mat-select formControlName='expenseSource' placeholder="Expense Source">
+				    <mat-option *ngFor="let source of sources" [value]="source.source">
+				      {{source.source}}
+				    </mat-option>
+				  </mat-select>			      
+			    </mat-form-field>
+			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			    <mat-form-field class='singleBlock'>
 			      <input matInput formControlName='amount' placeholder="Amount">
 			    </mat-form-field>
