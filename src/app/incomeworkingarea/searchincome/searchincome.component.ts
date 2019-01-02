@@ -75,11 +75,12 @@ export class SearchincomeComponent implements OnInit {
   }
 
   private _filter(value: string): Incomesors[] {
-    const filterValue = value.toLowerCase();
-
-    return this.incomesors.filter(function(el) {
-      return el.displayValue.toLowerCase().includes(filterValue);
-  });
+    if (typeof value === "string") {
+      const filterValue = value.toLowerCase();
+      return this.incomesors.filter(function(el) {
+        return el.displayValue.toLowerCase().includes(filterValue);
+    });
+    }
   }
 
   getPatientData() {

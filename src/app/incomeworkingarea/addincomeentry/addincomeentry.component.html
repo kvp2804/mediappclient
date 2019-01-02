@@ -8,21 +8,23 @@
 				  <mat-datepicker #picker></mat-datepicker>
 			    </mat-form-field>
 			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<mat-form-field class='singleBlock'>
-			      <mat-select formControlName='incomeFor' placeholder="Name">
-				    <mat-option *ngFor="let incomesor of incomesors" [value]="incomesor.id">
-				      {{incomesor.Name}}
-				    </mat-option>
-				  </mat-select>	
-			    </mat-form-field>
-			    		    
+          <mat-form-field class='singleBlock'>
+            <input  matInput [formControl]="incomesorSelectControl"  [matAutocomplete]="auto" placeholder="Name">
+          </mat-form-field>
+
+              <mat-autocomplete #auto="matAutocomplete" [displayWith]="AutoCompleteDisplay">
+              <mat-option  *ngFor="let option of filteredIncomesorOptions | async" [value]="option">
+                {{option.Name}}
+              </mat-option>
+            </mat-autocomplete>
+
 			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			    <mat-form-field  class='matForField'>
 			      <mat-select formControlName='incomeCategory' placeholder="Income Category">
 				    <mat-option *ngFor="let category of categories" [value]="category.category">
 				      {{category.category}}
 				    </mat-option>
-				  </mat-select>			      
+				  </mat-select>
 			    </mat-form-field>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			    <mat-form-field class='singleBlock'>
@@ -31,10 +33,10 @@
 			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			    <mat-form-field class='singleBlock'>
 			      <input matInput formControlName='description' placeholder="Description">
-			    </mat-form-field>			    
+			    </mat-form-field>
 		    </form>
-		   </mat-card>		
+		   </mat-card>
 		<br>
-		<button mat-raised-button color="accent" [disabled]="!incomeData.valid" (click)="onFormSubmit()">Submit</button>
+		<button mat-raised-button color="accent" [disabled]="!incomeData.valid || !incomesorSelectControl.valid" (click)="onFormSubmit()">Submit</button>
 	</mat-accordion>
 </div>

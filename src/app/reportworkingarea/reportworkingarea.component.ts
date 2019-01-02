@@ -60,10 +60,12 @@ export class ReportworkingareaComponent implements OnInit {
   }
 
   private _filter(value: string): Transactors[] {
-    const filterValue = value.toLowerCase();
-    return this.transactors.filter(function(el) {
-      return el.displayValue.toLowerCase().includes(filterValue);
-  });
+    if (typeof value === "string") {
+      const filterValue = value.toLowerCase();
+      return this.transactors.filter(function(el) {
+        return el.displayValue.toLowerCase().includes(filterValue);
+    });
+    }
   }
 
   getPatientData() {

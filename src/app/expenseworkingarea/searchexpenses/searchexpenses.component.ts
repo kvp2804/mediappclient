@@ -51,7 +51,7 @@ export class SearchexpensesComponent implements OnInit {
       {category: 'MISC'}
     ];
 
-   sources: ExpenseSource[] = [  
+   sources: ExpenseSource[] = [
       { source: 'Peti Cash' },
       { source: 'Cash' },
       { source: 'Journal Entries' },
@@ -84,11 +84,13 @@ export class SearchexpensesComponent implements OnInit {
   }
 
   private _filter(value: string): Expensors[] {
-    const filterValue = value.toLowerCase();
+    if (typeof value === "string") {
+      const filterValue = value.toLowerCase();
+      return this.expensors.filter(function(el) {
+        return el.displayValue.toLowerCase().includes(filterValue);
+    });
+    }
 
-    return this.expensors.filter(function(el) {
-      return el.displayValue.toLowerCase().includes(filterValue);
-  });
   }
 
   getPatientData() {
