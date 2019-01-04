@@ -2,7 +2,8 @@ import { Patients } from './patients';
 
 export class Expenses {	
 	expenseFor: {
-			_id: String
+			_id: String,
+			addmissionNo: number,
 			patientFirstName: String,
 			patientLastName: String
 		};

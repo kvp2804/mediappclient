@@ -1,9 +1,11 @@
 export class PatientLedger {
-	expenseDate: Date;	
+	expenseDate: Date;
+	expensePatientName: String;		
 	expenseCategory: String;
 	expenseAmount: number;	
 
-	incomeDate: Date;	
+	incomeDate: Date;
+	incomePatientName: String;
 	incomeCategory: String;
 	incomeAmount: number;
 }

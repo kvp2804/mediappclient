@@ -32,7 +32,7 @@ export class ReportworkingareaComponent implements OnInit {
   	EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
   	EXCEL_EXTENSION = '.xlsx';
 
-    displayedColumns: string[] = ['expenseDate', 'expenseCategory', 'expenseAmount', 'incomeDate', 'incomeCategory', 'incomeAmount'];
+    displayedColumns: string[] = ['expenseDate', 'expensePatientName', 'expenseCategory', 'expenseAmount', 'incomeDate', 'incomePatientName', 'incomeCategory', 'incomeAmount'];
     filteredTransactorOptions: Observable<Transactors[]>;
 
   constructor(private fb: FormBuilder, private patientService: PatientsService, private incomeService: IncomeService, private expensesService: ExpensesService) {
@@ -78,6 +78,7 @@ export class ReportworkingareaComponent implements OnInit {
     for(var i = 0; i<patients.length; i++) {
 
       let transactor: Transactors = {
+        id: patients[i].addmissionNo,
         value: patients[i]._id,
         displayValue: patients[i].patientFirstName + " " + patients[i].patientLastName
       };
@@ -92,12 +93,12 @@ export class ReportworkingareaComponent implements OnInit {
 
   onGenerateReport() {
 
-  	console.log("In the report section")
-
+  	console.log("In the report section");
+        
   	//End date should be selected one or today's date
   	var searchByEndDate = null;
-
-  	if( this.generateReportForm.get('searchEndDate').value != null )
+  	
+    if( this.generateReportForm.get('searchEndDate').value != null )
   	{
   		searchByEndDate = this.generateReportForm.get('searchEndDate').value;
   	}
@@ -106,82 +107,82 @@ export class ReportworkingareaComponent implements OnInit {
   		searchByEndDate = Date.now();
     }
 
-    var transactor = this.transactorSelectControl.value;
+    var transactor:Transactors = this.transactorSelectControl.value;
 
   	//Patient selection is mandatory
-  	if( transactor != null &&  transactor != "")
+  	if( transactor != null )
   	{
 
-  		//Get the income details of the selected patient.
-  		this.incomeService.getIncomebyDateForSpecificpatient(transactor.value, this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+      //Get the income details of the selected patient.
+  		this.incomeService.getIncomebyDateForSpecificpatient(transactor.value.toString(), this.generateReportForm.get('searchStartDate').value, searchByEndDate )
         .subscribe(incomedataSource => {
         	console.log("I am here 1");
-        	this.incomedataSource = incomedataSource
+        	this.incomedataSource = incomedataSource          
         });
 
   		//Get the income details of the selected patient.
-  		this.expensesService.getExpensebyDateForSpecificpatient(transactor.value, this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+  		this.expensesService.getExpensebyDateForSpecificpatient(transactor.value.toString(), this.generateReportForm.get('searchStartDate').value, searchByEndDate )
         .subscribe(expensedataSource =>{
         	console.log("I am here 2");
         	this.expensedataSource = expensedataSource;
-
-        	console.log("I am here 3");
-
-		    var counter: number = 0;
-		    var totalIncome: number = 0;
-		    var totalExpense: number = 0;
-		    this.dataSource = [];
-		    while( true )
-		    {
-		    	var patientLedger:PatientLedger = new PatientLedger();
-		    	var dataProcessed:boolean = false;
-
-		    	if( this.incomedataSource[counter] != null )
-		    	{
-		    		console.log("In the report section")
-		    		dataProcessed = true;
-		    		patientLedger.incomeDate = this.incomedataSource[counter].incomeDate;
-		    		patientLedger.incomeCategory = this.incomedataSource[counter].incomeCategory;
-		    		patientLedger.incomeAmount = this.incomedataSource[counter].amount;
-		    		totalIncome = totalIncome + patientLedger.incomeAmount;
-		    	}
-
-		    	if( this.expensedataSource[counter] != null )
-		    	{
-		    		console.log("In the report section")
-		    		dataProcessed = true;
-		    		patientLedger.expenseDate = this.expensedataSource[counter].expenseDate;
-		    		patientLedger.expenseCategory = this.expensedataSource[counter].expenseCategory;
-		    		patientLedger.expenseAmount = this.expensedataSource[counter].amount;
-		    		totalExpense = totalExpense + patientLedger.expenseAmount;
-		    	}
-
-
-
-		    	if( dataProcessed )
-		    	{
-		    		this.dataSource.push(patientLedger);
-		    		counter++;
-		    		continue;
-		    	}
-		    	else
-		    	{
-		    		var patientLedger:PatientLedger = new PatientLedger();
-				    patientLedger.expenseCategory = 'Total Expense';
-				    patientLedger.expenseAmount = totalExpense;
-				    patientLedger.incomeCategory = 'Total Income';
-				    patientLedger.incomeAmount = totalIncome;
-				    this.dataSource.push(patientLedger);
-		    		break;
-		    	}
-		    }
-
-
-
+          if( transactor.id != "10000" && transactor.id != "10001")
+          {
+            this.processReportTableData();
+          }
         });
+
+      if( transactor.id == "10000")
+      {
+        this.incomeService.getIncomebyDateForAllPatient( this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+        .subscribe(incomedataSource => {
+          console.log("I am here 3");
+          for(var i = 0; i<incomedataSource.length; i++) {
+              
+              console.log("This is the returned data: " + incomedataSource);              
+              
+              if( incomedataSource[i].incomeFor.addmissionNo != 10001 )
+              {
+                  this.incomedataSource.push(incomedataSource[i]);
+                  console.log("Thisis the assigned data: " + incomedataSource);
+              }             
+              
+            }
+
+            
+          
+        });
+
+        this.expensesService.getExpensebyDateForAllPatient( this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+          .subscribe(expensedataSource => {
+            console.log("I am here 4");
+            for(var i = 0; i<expensedataSource.length; i++) {
+              if( expensedataSource[i].expenseSource != "Journal Entries")
+              {
+                this.expensedataSource.push(expensedataSource[i]);  
+              }            
+            }
+
+            this.processReportTableData();
+            console.log("I am here 3");
+        });
+      }
+      else if( transactor.id == "10001" )
+      {
+          this.expensesService.getExpensebyDateForAllPatient( this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+          .subscribe(expensedataSource => {
+            console.log("I am here 4");
+            for(var i = 0; i<expensedataSource.length; i++) {
+              if( expensedataSource[i].expenseSource == "Peti Cash")
+              {
+                this.expensedataSource.push(expensedataSource[i]);  
+              }            
+            }
+
+            this.processReportTableData();
+            console.log("I am here 3");
+        });
+      }
     }
-
-
  }
 
  exportToExcel() {
@@ -195,5 +196,64 @@ export class ReportworkingareaComponent implements OnInit {
     XLSX.writeFile(workbook, excelFileName + '_report_' + new Date().getTime() + this.EXCEL_EXTENSION);
 
   }
+
+  processReportTableData()
+ {
+         console.log("I am here 5");
+        var counter: number = 0;
+        var totalIncome: number = 0;
+        var totalExpense: number = 0;
+        this.dataSource = [];
+        while( true )
+        {
+          var patientLedger:PatientLedger = new PatientLedger();
+          var dataProcessed:boolean = false;
+
+          if( this.incomedataSource[counter] != null )
+          {
+            console.log("In the report section")
+            dataProcessed = true;
+            patientLedger.incomeDate = this.incomedataSource[counter].incomeDate;            
+            patientLedger.incomePatientName = this.incomedataSource[counter].incomeFor.patientFirstName + ' ' + this.incomedataSource[counter].incomeFor.patientLastName;
+            patientLedger.incomeCategory = this.incomedataSource[counter].incomeCategory;
+            patientLedger.incomeAmount = this.incomedataSource[counter].amount;
+            totalIncome = totalIncome + patientLedger.incomeAmount;
+          }
+
+          if( this.expensedataSource[counter] != null )
+          {
+            console.log("In the report section")
+            dataProcessed = true;
+            patientLedger.expenseDate = this.expensedataSource[counter].expenseDate;
+            patientLedger.expensePatientName = this.expensedataSource[counter].expenseFor.patientFirstName + ' ' + this.expensedataSource[counter].expenseFor.patientLastName;
+            patientLedger.expenseCategory = this.expensedataSource[counter].expenseCategory;
+            patientLedger.expenseAmount = this.expensedataSource[counter].amount;
+            totalExpense = totalExpense + patientLedger.expenseAmount;
+          }
+
+          if( dataProcessed )
+          {
+            this.dataSource.push(patientLedger);
+            counter++;
+            continue;
+          }
+          else
+          {
+            var patientLedger:PatientLedger = new PatientLedger();
+            patientLedger.expenseCategory = 'Total Expense';
+            patientLedger.expenseAmount = totalExpense;
+            patientLedger.incomeCategory = 'Total Income';
+            patientLedger.incomeAmount = totalIncome;            
+            this.dataSource.push(patientLedger);
+
+            var patientLedgerBalance:PatientLedger = new PatientLedger();
+            var balance = totalIncome - totalExpense
+            patientLedgerBalance.incomeCategory = 'Difference (Income - Expense)';
+            patientLedgerBalance.incomeAmount = balance;
+            this.dataSource.push(patientLedgerBalance);
+            break;
+          }
+        }
+ }
 
 }

@@ -117,7 +117,7 @@ export class SearchincomeComponent implements OnInit {
 
   populateIncomeData(incomeFromServer: Income[]){
 
-    console.log(incomeFromServer);
+    console.log("This is income data from server: " + incomeFromServer);
 
     this.dataSourceRaw = [];
     for(var i = 0; i<incomeFromServer.length; i++) {

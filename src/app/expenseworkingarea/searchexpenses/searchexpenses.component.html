@@ -34,7 +34,7 @@
 	<table mat-table [dataSource]='dataSource' matSort 	class='mat-elevation-z8' id='expenseTable'>
 		<ng-container matColumnDef="expenseDate">
 		    <th mat-header-cell *matHeaderCellDef mat-sort-header> Expense Date </th>
-		    <td mat-cell *matCellDef="let element"> {{element.expenseDate|date: 'medium'}} </td>
+		    <td mat-cell *matCellDef="let element"> {{element.expenseDate|date: 'longDate'}} </td>
 		</ng-container>
 
 		<ng-container matColumnDef="expenseFor">
