@@ -21,7 +21,8 @@ export class SearchpatientsComponent implements OnInit {
     'status':'Status',
     'contactPerson':'Contact Person',
     'contactPersonNumber':'Contact Person Number',
-    'dateOfBirth':'Date Of Birth'
+    'dateOfBirth':'Date Of Birth',
+    'dateofadmission': 'Date of Admission'
     };
   dataSourceFromServer: Patients[];  
 	//dataSource: Patients[];// = [];
@@ -148,7 +149,16 @@ export class SearchpatientsComponent implements OnInit {
       for(var j = 0; j < this.displayedColumns.length; j++){
         if (this.displayedColumns[j] !== "delete") {
           var actualColumnHeader = this.displayedColumnsToTableHeaderMapping[this.displayedColumns[j]];
-          output[actualColumnHeader] = data[this.displayedColumns[j]];
+          if( this.displayedColumns[j] == 'status')
+          {
+            output[actualColumnHeader] = data.patientAddmissionStatus[data.patientAddmissionStatus.length - 1].status;
+            output['Date of Admission'] = data.patientAddmissionStatus[0].dateOfStatusChange;
+          }
+          else
+          {
+             output[actualColumnHeader] = data[this.displayedColumns[j]];
+          }
+          
         }
       }
       excelOutputJson.push(output);

@@ -165,6 +165,7 @@ export class SearchincomeComponent implements OnInit {
 
   onIncomeSearch() {
   	var whichServiceToExecute = new String();
+    var searchByStartDate = this.incomeSearchForm.get('searchStartDate').value;
     var searchByEndDate = this.incomeSearchForm.get('searchEndDate').value;
     var incomesor = this.incomesorSelectControl.value;
 
@@ -176,6 +177,8 @@ export class SearchincomeComponent implements OnInit {
 	  	}
 	  	else
 	  	{
+        var utcDate:Date = new Date(this.incomeSearchForm.get('searchStartDate').value);
+        searchByStartDate = utcDate.toUTCString();
 	  		if( this.incomeSearchForm.get('searchEndDate').value == null )
 	  		{
 	  			searchByEndDate = Date.now();
@@ -191,6 +194,8 @@ export class SearchincomeComponent implements OnInit {
 	  	}
 	  	else
 	  	{
+        var utcDate:Date = new Date(this.incomeSearchForm.get('searchStartDate').value);
+        searchByStartDate = utcDate.toUTCString();
 	  		if( this.incomeSearchForm.get('searchEndDate').value == null )
 	  		{
 	  			searchByEndDate = Date.now();
@@ -203,7 +208,7 @@ export class SearchincomeComponent implements OnInit {
   	if( whichServiceToExecute === "SearchIncomeByPatientSpecificDates" )
   	{
       console.log("In SearchIncomeByPatientSpecificDates");
-  		this.incomeService.getIncomebyDateForSpecificpatient(incomesor.value, this.incomeSearchForm.get('searchStartDate').value, searchByEndDate )
+  		this.incomeService.getIncomebyDateForSpecificpatient(incomesor.value, searchByStartDate, searchByEndDate )
         .subscribe(dataSourceFromServer => this.populateIncomeData( dataSourceFromServer ));
   	}
   	else if( whichServiceToExecute === "SearchIncomeByPatientAllDates")
@@ -217,7 +222,7 @@ export class SearchincomeComponent implements OnInit {
   	else if( whichServiceToExecute === "SearchIncomeForAllPatientsSpecificDates")
   	{
       console.log("In SearchIncomeForAllPatientsSpecificDates");
-  		this.incomeService.getIncomebyDateForAllPatient(this.incomeSearchForm.get('searchStartDate').value, searchByEndDate )
+  		this.incomeService.getIncomebyDateForAllPatient(searchByStartDate, searchByEndDate )
         .subscribe(dataSourceFromServer => this.populateIncomeData( dataSourceFromServer ));
   	}
  }

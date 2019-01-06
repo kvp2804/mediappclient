@@ -96,8 +96,14 @@ export class AddexpenseentryComponent implements OnInit {
      var expensor = this.expensorSelectControl.value;
 	  	newExpense.expenseFor =  expensor.id;
 	  	newExpense.dateOfEntry = new Date(Date.now());
-	  	newExpense.expenseDate = this.expenseData.get('dateOfExpense').value;
+	  	newExpense.expenseDate = new Date(this.expenseData.get('dateOfExpense').value);
+      console.log("Date now:" +  Date.now());
+      console.log("Date value:" +  newExpense.expenseDate);
+      var utcData: Date = new Date(this.expenseData.get('dateOfExpense').value);
+      console.log("New Date object:" +  utcData);
+      console.log("Date UTC value:" +  utcData.toUTCString());
 	  	newExpense.description = this.expenseData.get('description').value;
+
 	  	newExpense.amount= this.expenseData.get('amount').value;
 	  	newExpense.expenseCategory = this.expenseData.get('expenseCategory').value;
 	  	newExpense.expenseSource = this.expenseData.get('expenseSource').value;

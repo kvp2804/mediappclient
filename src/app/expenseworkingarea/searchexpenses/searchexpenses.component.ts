@@ -177,19 +177,23 @@ export class SearchexpensesComponent implements OnInit {
     this.expensesService.updateExpense( newExpense, expense._id ).subscribe();
   }
 
-  onExpenseSearch() {
+  onExpenseSearch() {    
     var whichServiceToExecute = new String();
+    var searchByStartDate = this.expenseSearchForm.get('searchStartDate').value;
     var searchByEndDate = this.expenseSearchForm.get('searchEndDate').value;
     var expensor = this.expensorSelectControl.value;
 
     if( expensor == null || expensor == "" )
-    {
-      if( this.expenseSearchForm.get('searchStartDate').value == null )
+    {       
+      if( searchByStartDate == null )
       {
         whichServiceToExecute = 'NoExecution';
       }
       else
       {
+        var utcDate:Date = new Date(this.expenseSearchForm.get('searchStartDate').value);
+        searchByStartDate = utcDate.toUTCString;        
+
         if( this.expenseSearchForm.get('searchEndDate').value == null )
         {
           searchByEndDate = Date.now();
@@ -198,13 +202,15 @@ export class SearchexpensesComponent implements OnInit {
       }
     }
     else
-    {
+    {      
       if( this.expenseSearchForm.get('searchStartDate').value == null )
       {
         whichServiceToExecute = 'SearchExpenseByPatientAllDates';
       }
       else
       {
+        var utcDate:Date = new Date(this.expenseSearchForm.get('searchStartDate').value);
+        searchByStartDate = utcDate.toUTCString();        
         if( this.expenseSearchForm.get('searchEndDate').value == null )
         {
           searchByEndDate = Date.now();
@@ -216,7 +222,7 @@ export class SearchexpensesComponent implements OnInit {
 
     if( whichServiceToExecute === "SearchExpenseByPatientSpecificDates" )
     {
-      this.expensesService.getExpensebyDateForSpecificpatient(expensor.value, this.expenseSearchForm.get('searchStartDate').value, searchByEndDate )
+      this.expensesService.getExpensebyDateForSpecificpatient(expensor.value, searchByStartDate, searchByEndDate )
         .subscribe(dataSourceFromServer => this.populateExpenseData( dataSourceFromServer ));
     }
     else if( whichServiceToExecute === "SearchExpenseByPatientAllDates")
@@ -226,7 +232,7 @@ export class SearchexpensesComponent implements OnInit {
     }
     else if( whichServiceToExecute === "SearchExpenseForAllPatientsSpecificDates")
     {
-      this.expensesService.getExpensebyDateForAllPatient(this.expenseSearchForm.get('searchStartDate').value, searchByEndDate )
+      this.expensesService.getExpensebyDateForAllPatient(searchByStartDate, searchByEndDate )
         .subscribe(dataSourceFromServer => this.populateExpenseData( dataSourceFromServer ));
     }
  }

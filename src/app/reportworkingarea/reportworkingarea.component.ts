@@ -32,7 +32,8 @@ export class ReportworkingareaComponent implements OnInit {
   	EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
   	EXCEL_EXTENSION = '.xlsx';
 
-    displayedColumns: string[] = ['expenseDate', 'expensePatientName', 'expenseCategory', 'expenseAmount', 'incomeDate', 'incomePatientName', 'incomeCategory', 'incomeAmount'];
+    displayedColumns: string[] = ['expenseDate', 'expensePatientName', 'expenseCategory', 'expenseDescription', 'expenseAmount', 'incomeDate', 'incomePatientName', 'incomeCategory', 'incomeDescription', 'incomeAmount'];
+
     filteredTransactorOptions: Observable<Transactors[]>;
 
   constructor(private fb: FormBuilder, private patientService: PatientsService, private incomeService: IncomeService, private expensesService: ExpensesService) {
@@ -113,15 +114,18 @@ export class ReportworkingareaComponent implements OnInit {
   	if( transactor != null )
   	{
 
+      var utcDate:Date = new Date(this.generateReportForm.get('searchStartDate').value);
+      var searchByStartDate = utcDate.toUTCString();
+
       //Get the income details of the selected patient.
-  		this.incomeService.getIncomebyDateForSpecificpatient(transactor.value.toString(), this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+  		this.incomeService.getIncomebyDateForSpecificpatient(transactor.value.toString(), searchByStartDate, searchByEndDate )
         .subscribe(incomedataSource => {
         	console.log("I am here 1");
         	this.incomedataSource = incomedataSource          
         });
 
   		//Get the income details of the selected patient.
-  		this.expensesService.getExpensebyDateForSpecificpatient(transactor.value.toString(), this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+  		this.expensesService.getExpensebyDateForSpecificpatient(transactor.value.toString(), searchByStartDate, searchByEndDate )
         .subscribe(expensedataSource =>{
         	console.log("I am here 2");
         	this.expensedataSource = expensedataSource;
@@ -133,7 +137,7 @@ export class ReportworkingareaComponent implements OnInit {
 
       if( transactor.id == "10000")
       {
-        this.incomeService.getIncomebyDateForAllPatient( this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+        this.incomeService.getIncomebyDateForAllPatient( searchByStartDate, searchByEndDate )
         .subscribe(incomedataSource => {
           console.log("I am here 3");
           for(var i = 0; i<incomedataSource.length; i++) {
@@ -146,13 +150,11 @@ export class ReportworkingareaComponent implements OnInit {
                   console.log("Thisis the assigned data: " + incomedataSource);
               }             
               
-            }
-
-            
+            }           
           
         });
 
-        this.expensesService.getExpensebyDateForAllPatient( this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+        this.expensesService.getExpensebyDateForAllPatient( searchByStartDate, searchByEndDate )
           .subscribe(expensedataSource => {
             console.log("I am here 4");
             for(var i = 0; i<expensedataSource.length; i++) {
@@ -168,7 +170,7 @@ export class ReportworkingareaComponent implements OnInit {
       }
       else if( transactor.id == "10001" )
       {
-          this.expensesService.getExpensebyDateForAllPatient( this.generateReportForm.get('searchStartDate').value, searchByEndDate )
+          this.expensesService.getExpensebyDateForAllPatient( searchByStartDate, searchByEndDate )
           .subscribe(expensedataSource => {
             console.log("I am here 4");
             for(var i = 0; i<expensedataSource.length; i++) {
@@ -214,8 +216,15 @@ export class ReportworkingareaComponent implements OnInit {
             console.log("In the report section")
             dataProcessed = true;
             patientLedger.incomeDate = this.incomedataSource[counter].incomeDate;            
-            patientLedger.incomePatientName = this.incomedataSource[counter].incomeFor.patientFirstName + ' ' + this.incomedataSource[counter].incomeFor.patientLastName;
+            if( this.incomedataSource[counter].incomeFor != null )
+            {
+
+              patientLedger.incomePatientName = this.incomedataSource[counter].incomeFor.patientFirstName + ' ' + this.incomedataSource[counter].incomeFor.patientLastName;
+
+            }
+            
             patientLedger.incomeCategory = this.incomedataSource[counter].incomeCategory;
+            patientLedger.incomeDescription = this.incomedataSource[counter].description;
             patientLedger.incomeAmount = this.incomedataSource[counter].amount;
             totalIncome = totalIncome + patientLedger.incomeAmount;
           }
@@ -225,8 +234,13 @@ export class ReportworkingareaComponent implements OnInit {
             console.log("In the report section")
             dataProcessed = true;
             patientLedger.expenseDate = this.expensedataSource[counter].expenseDate;
-            patientLedger.expensePatientName = this.expensedataSource[counter].expenseFor.patientFirstName + ' ' + this.expensedataSource[counter].expenseFor.patientLastName;
+            if( this.expensedataSource[counter].expenseFor != null )
+            {
+              patientLedger.expensePatientName = this.expensedataSource[counter].expenseFor.patientFirstName + ' ' + this.expensedataSource[counter].expenseFor.patientLastName;  
+            }
+            
             patientLedger.expenseCategory = this.expensedataSource[counter].expenseCategory;
+            patientLedger.expenseDescription = this.expensedataSource[counter].description;
             patientLedger.expenseAmount = this.expensedataSource[counter].amount;
             totalExpense = totalExpense + patientLedger.expenseAmount;
           }
